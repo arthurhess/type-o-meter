@@ -1,45 +1,49 @@
 import React, { Component } from 'react';
-import { core as ZingChart } from 'zingchart-react';
+import ZingChart from 'zingchart';
+import { core as Chart } from 'zingchart-react';
 
-class BarChart extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = this.initDataset();
-  }
+class LetterFrequencyChart extends Component {
 
   render() {
-    return <ZingChart id="bar-chart" data={ this.getChartConfig(this.state) }/>;
+    return <Chart id={this.props.id} data={ this.getChartConfig() }/>;
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState(this.calculateAbsoluteFrequencies(nextProps.data));
+    if (this.props.text !== nextProps.text)
+      this.updateChart(nextProps.text);
+  }
+
+  updateChart(text) {
+    const absoluteFreqMap = this.calculateAbsoluteFrequencies(text);
+
+    const relativeFreqArray = Object.values(absoluteFreqMap).map(freq => (
+      freq / text.length || 0
+    ));
+
+    ZingChart.exec(this.props.id, 'setseriesdata', {
+      'plotindex': 0,
+      'data': {
+        'text': 'In your text',
+        'type': 'bar',
+        'values': relativeFreqArray
+      }
+    });
   }
 
   /*
    * Incrementing it char by char doesn't work with copy & pastes
    * TODO: calculate frequencies only for the diff oldString-newString
    */
-  calculateAbsoluteFrequencies(data) {
-    const frequencies = this.initDataset();
+  calculateAbsoluteFrequencies(text) {
+    const frequencies = this.getBlankFrequencyMap();
 
-    for (let character of data)
+    for (let character of text)
       if (character.match(/[a-z]/i)) frequencies[character.toLowerCase()]++
 
     return frequencies;
   }
 
-  initDataset() {
-    return {
-      a: 0, b: 0, c: 0, d: 0, e: 0, f: 0, g: 0, h: 0, i: 0,
-      j: 0, k: 0, l: 0, m: 0, n: 0, o: 0, p: 0, q: 0, r: 0,
-      s: 0, t: 0, u: 0, v: 0, w: 0, x: 0, y: 0, z: 0
-    };
-  }
-
-  getChartConfig(dataset) {
-    const relativeFrequenciesText = Object.values(dataset).map(value => value / this.props.data.length);
-
+  getChartConfig() {
     const relativeFrequenciesEnglish = [
       0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015,
       0.06094, 0.06966, 0.00153, 0.00772, 0.04025, 0.02406, 0.06749,
@@ -63,7 +67,7 @@ class BarChart extends Component {
         'margin-top': '30px'
       },
       'scale-x': {
-        'labels': Object.keys(dataset)
+        'labels': Object.keys(this.getBlankFrequencyMap())
       },
       'scale-y': {
         'step': 0.025
@@ -74,7 +78,7 @@ class BarChart extends Component {
       'series': [
         {
           'type': 'bar',
-          'values': relativeFrequenciesText,
+          'values': [],
           'text': 'In your text'
         },
         {
@@ -90,6 +94,14 @@ class BarChart extends Component {
     };
   }
 
+  getBlankFrequencyMap() {
+    return {
+      a: 0, b: 0, c: 0, d: 0, e: 0, f: 0, g: 0, h: 0, i: 0,
+      j: 0, k: 0, l: 0, m: 0, n: 0, o: 0, p: 0, q: 0, r: 0,
+      s: 0, t: 0, u: 0, v: 0, w: 0, x: 0, y: 0, z: 0
+    };
+  }
+
 }
 
-export default BarChart;
+export default LetterFrequencyChart;
