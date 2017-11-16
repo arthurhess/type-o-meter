@@ -1,0 +1,17 @@
+#root {
+  margin: 0 auto;
+}
+
+h1, h4 {
+  font-family: sans-serif;
+  font-weight: 300;
+  text-align: center;
+}
+
+h4 { margin-top: 0; }
+
+@media (min-width: 1100px) {
+    #root {
+      max-width: 50%;
+    }
+}

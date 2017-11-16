@@ -5,9 +5,19 @@ import { core as Chart } from 'zingchart-react';
 class LetterFrequencyChart extends Component {
 
   render() {
-    return <Chart id={this.props.id} data={ this.getChartConfig() }/>;
+    return (
+      <div style={ this.props.style }>
+        <Chart id={this.props.id} data={ this.getChartConfig() } width="auto" />
+      </div>
+    );
   }
 
+  // First update
+  componentDidMount() {
+    this.updateChart(this.props.text);
+  }
+
+  // Subsequent updates
   componentWillReceiveProps(nextProps) {
     if (this.props.text !== nextProps.text)
       this.updateChart(nextProps.text);
@@ -20,13 +30,9 @@ class LetterFrequencyChart extends Component {
       freq / text.length || 0
     ));
 
-    ZingChart.exec(this.props.id, 'setseriesdata', {
-      'plotindex': 0,
-      'data': {
-        'text': 'In your text',
-        'type': 'bar',
-        'values': relativeFreqArray
-      }
+    ZingChart.exec(this.props.id, 'setseriesvalues', {
+      plotindex: 0,
+      values: relativeFreqArray
     });
   }
 
@@ -52,43 +58,44 @@ class LetterFrequencyChart extends Component {
     ];
 
     return {
-      'type': 'mixed',
-      'title': {
-        'text': 'Relative frequencies of letters',
-        'font-size': 14
+      type: 'mixed',
+      title: {
+        text: 'Relative frequencies of letters',
+        fontSize: 14
       },
-      'plotarea': {
-        'margin-top': 10
+      margin: '0 auto',
+      plotarea: {
+        marginTop: 10
       },
-      'legend': {
-        'alpha': 0,
-        'layout': '1x2',
-        'align': 'center',
-        'margin-top': '30px'
+      legend: {
+        alpha: 0,
+        layout: '1x2',
+        align: 'center',
+        marginTop: 30
       },
-      'scale-x': {
-        'labels': Object.keys(this.getBlankFrequencyMap())
+      scaleX: {
+        labels: Object.keys(this.getBlankFrequencyMap())
       },
-      'scale-y': {
-        'step': 0.025
+      scaleY: {
+        step: 0.025
       },
-      'plot': {
-        'aspect': 'spline'
+      plot: {
+        aspect: 'spline'
       },
-      'series': [
+      series: [
         {
-          'type': 'bar',
-          'values': [],
-          'text': 'In your text'
+          type: 'bar',
+          values: [],
+          text: 'In your text'
         },
         {
-          'type': 'line',
-          'line-style': 'dotted',
-          'marker': {
-            'alpha': 0
+          type: 'line',
+          lineStyle: 'dotted',
+          marker: {
+            alpha: 0
           },
-          'values': relativeFrequenciesEnglish,
-          'text': 'In the English language'
+          values: relativeFrequenciesEnglish,
+          text: 'In the English language'
         }
       ]
     };

@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { core as ZingChart } from 'zingchart-react';
+
+const defaultStyle = {
+  display: 'flex'
+};
 
 class Gauge extends Component {
 
@@ -11,17 +14,15 @@ class Gauge extends Component {
       cps: 0
     };
 
-    this.dataLength = 0;
+    this.textLength = this.props.text.length;
     this.updateTime = Date.now();
     this.timer = setInterval(this.calculateTypingSpeed.bind(this), 1000);
   }
 
   render() {
     return (
-      <div>
-        {/* <ZingChart id="gauge" */}
-        <p>WPM: { this.state.wpm }</p>
-        <p>CPS: { this.state.cps }</p>
+      <div style={ { ...defaultStyle, ...this.props.style } }>
+        <p>Words per minute: { this.state.wpm }</p>
       </div>
     );
   }
@@ -29,18 +30,18 @@ class Gauge extends Component {
   calculateTypingSpeed() {
     const updateTime = Date.now();
     const elapsedTime = updateTime - this.updateTime;
-    const dataLength = this.props.data.length;
+    const textLength = this.props.text.length;
 
-    let charCount = dataLength - this.dataLength;
+    let charCount = textLength - this.textLength;
     charCount = charCount < 0 ? 0 : charCount;
 
-    this.dataLength = dataLength;
+    this.textLength = textLength;
     this.updateTime = updateTime;
 
     const cps = Math.round(charCount / (elapsedTime / 1000));
     const wpm = Math.round(cps * 12);
 
-    this.setState({ wpm, cps, dataLength, updateTime });
+    this.setState({ wpm, cps, textLength, updateTime });
   }
 
   componentWillUnmount() {
